@@ -1,0 +1,28 @@
+digraph ERD {
+  graph [rankdir=LR, splines=polyline, nodesep=0.55, ranksep=0.9, bgcolor="white", fontname="Arial", label="JulleyOnline — Multi-Organization / Multi-Tenant ER Diagram", labelloc=t, fontsize=20, pad=0.3];
+  node [shape=record, style="rounded,filled", fillcolor="#F7F8FC", color="#64748B", fontname="Arial", fontsize=10, margin="0.12,0.08"];
+  edge [color="#64748B", fontname="Arial", fontsize=9, arrowsize=0.7];
+  organizations [label="{organizations|PK id: UUID\lname: VARCHAR\lcreated_at: TIMESTAMP\lupdated_at: TIMESTAMP\l}"];
+  tenants [label="{tenants|PK id: UUID\lFK organization_id: UUID\lname: VARCHAR\lcreated_at: TIMESTAMP\lupdated_at: TIMESTAMP\l}"];
+  users [label="{users|PK id: UUID\lname: VARCHAR\lUK email: VARCHAR\lpassword_hash: VARCHAR\lcreated_at: TIMESTAMP\lupdated_at: TIMESTAMP\l}"];
+  memberships [label="{memberships|PK id: UUID\lFK user_id: UUID\lFK organization_id: UUID\lFK tenant_id: UUID NULL\lrole: VARCHAR\lcreated_at: TIMESTAMP\l}"];
+  boards [label="{boards|PK id: UUID\lFK organization_id: UUID\lFK tenant_id: UUID\lname: VARCHAR\ldescription: TEXT\lFK created_by: UUID\lcreated_at / updated_at\l}"];
+  columns [label="{columns|PK id: UUID\lFK board_id: UUID\lFK tenant_id: UUID\lname: VARCHAR\lposition: INTEGER\lcreated_at: TIMESTAMP\l}"];
+  tasks [label="{tasks|PK id: UUID\lFK board_id: UUID\lFK column_id: UUID\lFK tenant_id: UUID\ltitle: VARCHAR\ldescription: TEXT\lFK assigned_to: UUID NULL\lpriority / due_date\lposition: INTEGER\lversion: INTEGER\lcreated_at / updated_at\l}"];
+  activity_logs [label="{activity_logs|PK id: UUID\lFK tenant_id: UUID\lFK user_id: UUID\lentity_type: VARCHAR\lentity_id: UUID\laction: VARCHAR\ldetails: JSONB\lcreated_at: TIMESTAMP\l}"];
+  organizations -> tenants [label="1 : N"];
+  organizations -> memberships [label="1 : N"];
+  users -> memberships [label="1 : N"];
+  tenants -> memberships [label="1 : N"];
+  organizations -> boards [label="1 : N"];
+  tenants -> boards [label="1 : N"];
+  users -> boards [label="creates"];
+  boards -> columns [label="1 : N"];
+  tenants -> columns [label="1 : N"];
+  boards -> tasks [label="1 : N"];
+  columns -> tasks [label="1 : N"];
+  tenants -> tasks [label="1 : N"];
+  users -> tasks [label="assigned to"];
+  tenants -> activity_logs [label="1 : N"];
+  users -> activity_logs [label="1 : N"];
+}
